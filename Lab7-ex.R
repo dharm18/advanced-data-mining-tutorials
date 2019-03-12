@@ -74,4 +74,17 @@ plotResults <- function(resultsDF, kernel){
     ggtitle(paste("Performance for the ", kernel, "kernel against no. of PCs"))
 }
 
+#linear kernel
 plotResults(results, kernels[1])
+#polynomial kernel
+plotResults(results, kernels[2])
+#radial kernel
+plotResults(results, kernels[3])
+#sigmoid kernel
+plotResults(results, kernels[4])
+
+
+r <- results[, c(5:7)]
+m <- melt(r, id=c("PCs","Kernel"))
+ggplot(m, aes(x = PCs, y=value, colour = Kernel)) + geom_line() + 
+  ggtitle("Kernel runtime against no. of PCs") + ylab("Runtime (secs)")
