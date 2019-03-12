@@ -88,3 +88,10 @@ r <- results[, c(5:7)]
 m <- melt(r, id=c("PCs","Kernel"))
 ggplot(m, aes(x = PCs, y=value, colour = Kernel)) + geom_line() + 
   ggtitle("Kernel runtime against no. of PCs") + ylab("Runtime (secs)")
+
+
+library(dplyr)
+
+results <- results %>% mutate(AccuracyRank = dense_rank(-Accuracy))
+results <- results[order(results$AccuracyRank),]
+head(results, 15)
