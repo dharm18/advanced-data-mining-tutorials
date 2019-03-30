@@ -200,3 +200,18 @@ install.packages("gbm")
 predictors <- c("pred_knn", "pred_c50", "pred_cart")
 gbm <- train(train[, predictors], train$Alcohol, methods="gbm", trControl=tuneParams, tuneLength=3)
 gbm
+
+
+validation$pred_knn <- factor(knn.pred)
+validation$pred_c50 <- factor(c50.pred)
+validation$pred_cart <- factor(rpart.pred)
+
+gbm.pred <- predict(gbm, validation[, predictors])
+
+confusionMatrix(validation$Alcohol, gbm.pred)
+
+#### 97%
+
+#### boosting
+train <- wine[index,]
+boosted <- train(train, train$Alcohol, method='adaboost', trControl=tuneParams, tuneLength=3)
