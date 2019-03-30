@@ -1,4 +1,4 @@
-# Ensembles
+# Ensemble Learning
 
 # three different types of wines
 # we will use ensemble learning to see how well we can classify them
@@ -29,7 +29,7 @@ str(wine)
 wine$Alcohol <- factor(wine$Alcohol) # make it categorical
 barplot(table(wine$Alcohol))
 
-boxplot(wine[,c(2:14)])
+boxplot(wine[,c(2:13)])
 
 # features not normalised
 
