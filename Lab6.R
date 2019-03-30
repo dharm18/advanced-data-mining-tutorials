@@ -49,7 +49,7 @@ winekNN[,c(2:14)] <- sapply(winekNN[,2:14],
 summary(winekNN)
 
 ## create stratified validation sample
-set.seed(357)
+set.seed(1337)
 library(caret)
 
 #75/25 data partition
@@ -112,8 +112,8 @@ c50Tree <- train(train[,c50Features], train$Alcohol, method="C5.0",
 c50.pred <- predict(c50Tree, newdata=validation[,c50Features])
 confusionMatrix(c50.pred, validation$Alcohol)
 
-# knn - 70 %
-# c5.0 = 90.7 %
+# knn - 81 %
+# c5.0 = 88.37 %
 # CART = 88.37 %
 
 #combination == 0.907
@@ -135,7 +135,7 @@ rpartTree <- train(trainCART[,cartFeatures], trainCART$Alcohol,
                    method="rpart",trControl=tuneParams,
                    tuneLength=3)
 
-rpart.pred <- predict(rpartTree, newdata= validation[, cartFeatures])
+rpart.pred <- predict(rpartTree, newdata= validationCART[, cartFeatures])
 confusionMatrix(rpart.pred, validationCART$Alcohol)
 
 # combining 
@@ -163,7 +163,32 @@ confusionMatrix(validation$Alcohol,validation$preds)
 # c5.0 = 90.7 %
 # CART = 88.37 %
 
-#combination == 0.907
+#combination == 93.02 %
+## Ensemble > c5.0 > CART > knn
+
+###################################################################
+## selecting 3 models that had the higest confidence
+###################################################################
+
+dfPred <- cbind(validation$pred_rpart_prob, validation$pred_c50_prob, validation$pred_knn_prob)
+validation$maxConfidence <- apply(dfPred, 1, FUN=function(x) {which.max(x)})
+summary(validation$maxConfidence)
+
+validation$maxConfidence[validation$maxConfidence > 6] <- 
+  validation$maxConfidence[validation$maxConfidence > 6] - 6
+
+validation$maxConfidence[validation$maxConfidence > 3] <- 
+  validation$maxConfidence[validation$maxConfidence > 3] - 3
+
+summary(validation$maxConfidence)
+
+validation$maxConfidence <- factor(validation$maxConfidence,
+                                   levels = c(1:3),
+                                   labels = c(1:3)
+                                   )
+confusionMatrix(validation$Alcohol, validation$maxConfidence)
+
+#### 93% Accuracy
 
 ########### STACKING ##########
 train <- wine[index,]
