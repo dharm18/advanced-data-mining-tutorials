@@ -141,3 +141,12 @@ titanicData$FsizeD <- as.factor(titanicData$FsizeD)
 contrasts(titanicData$Sex)
 
 contrasts(titanicData$Pclass)
+
+#80/20 split
+set.seed(345)
+
+index <- sample(1:nrow(titanicData),nrow(titanicData)*.80, replace = FALSE)
+
+training <- titanicData[index,]
+test <- titanicData[-index,]
+
