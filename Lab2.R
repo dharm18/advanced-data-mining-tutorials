@@ -94,3 +94,50 @@ auc <- performance(ROCRPred,measure = "auc")
 auc<- auc@y.values[[1]]
 auc
 
+
+#----------------------------------------------------------
+
+install.packages("mice")
+library(mice)
+titanicData <- read.csv("titanic.csv", header=T, na.strings=c(""), stringsAsFactors = T)
+titanicData$Survived <- factor(titanicData$Survived, levels = c(0,1), labels = c("No", "Yes"))
+titanicData$Pclass <- as.factor(titanicData$Pclass)
+titanicData <- titanicData[, -c(1,11)] #remove feature 1 and 11
+titanicData$Embarked[c(62, 830)] <- 'C' #result of Embarked imputation exercise
+
+#use a random forest to impute missing age values
+mice_mod <- mice(titanicData[, !names(titanicData) %in%
+                               c('PassengerId','Name','Ticket','Cabin','Survived')], method='rf')
+mice_output <- complete(mice_mod)
+titanicData$Age <- mice_output$Age
+#feature engineering: make a feature to represent a passenger is a child
+titanicData$Child[titanicData$Age < 18] <- "Yes"
+titanicData$Child[titanicData$Age >= 18] <- "No"
+titanicData$Child <- factor(titanicData$Child)
+#feature engineer a title feature
+rare_title <- c('Dona', 'Lady', 'the Countess','Capt', 'Col', 'Don',
+                'Dr', 'Major', 'Rev', 'Sir', 'Jonkheer')
+titanicData$Title <- gsub('(.*, )|(\\..*)', '', titanicData$Name)
+titanicData$Title[titanicData$Title == 'Mlle'] <- 'Miss'
+titanicData$Title[titanicData$Title == 'Ms'] <- 'Miss'
+titanicData$Title[titanicData$Title == 'Mme'] <- 'Mrs'
+titanicData$Title[titanicData$Title %in% rare_title] <- 'Rare Title'
+titanicData$Title <- as.factor(titanicData$Title)
+#feature engineer a few more things using the passenger name
+titanicData$Name <- as.character(titanicData$Name)
+titanicData$Surname <- sapply(titanicData$Name,
+                              FUN=function(x) {strsplit(x, split='[,.]')[[1]][1]})
+titanicData$Fsize <- titanicData$SibSp + titanicData$Parch + 1
+#remove features 3, 7, and 11
+titanicData[3] <- NULL
+titanicData[7] <- NULL
+titanicData[11] <- NULL
+# feature engineer a family size categorical variable
+titanicData$FsizeD[titanicData$Fsize == 1] <- 'singleton'
+titanicData$FsizeD[titanicData$Fsize < 5 & titanicData$Fsize > 1] <- 'small'
+titanicData$FsizeD[titanicData$Fsize > 4] <- 'large'
+titanicData$FsizeD <- as.factor(titanicData$FsizeD)
+
+contrasts(titanicData$Sex)
+
+contrasts(titanicData$Pclass)
