@@ -8,7 +8,7 @@ output:
     df_print: paged
 ---
 ```{r}
-print("asdasd")
+print("test print")
 ```
 
 ```{r setup, include=FALSE}
