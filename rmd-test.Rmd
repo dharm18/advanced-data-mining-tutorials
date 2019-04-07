@@ -1,7 +1,7 @@
 ---
-title: "RMarkdown test"
+title: "Advanced Data Mining - Lab"
 author: "Dharmendra Vishwakarma"
-date: "27 March 2019"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   pdf_document: default
   html_document:
