@@ -13,8 +13,10 @@ testIris <- irisData[-index,]
 
 #run kNN
 #install.packages("caret","class")
+install.packages("data.table")
 install.packages("e1071")
 library("class")
+library("data.table")
 library("caret")
 library("e1071")
 
@@ -150,3 +152,48 @@ index <- sample(1:nrow(titanicData),nrow(titanicData)*.80, replace = FALSE)
 training <- titanicData[index,]
 test <- titanicData[-index,]
 
+n <- sapply(titanicData, function(x) {is.numeric(x)})
+n
+numerics <-titanicData[, n]
+summary(numerics)
+
+normalize <- function(x) { return ((x - min(x)) / (max(x) - min(x))) }
+numericsNormal <- normalize(numerics)
+summary(numericsNormal)
+
+titanicDataKNN <- titanicData[, !n]
+titanicDataKNN <- cbind(titanicDataKNN, numericsNormal)
+
+install.packages("dummies")
+library(dummies)
+
+tkNN <- dummy.data.frame(titanicDataKNN[, -1])
+summary(tkNN)
+Survived <- titanicDataKNN$Survived
+
+index <- sample(1:nrow(tkNN),nrow(tkNN)*.80, replace = FALSE)
+
+
+str(tkNN)
+kNNTraining <- tkNN[index,]
+kNNTesting <- tkNN[-index,]
+survivedTrain <- Survived[index]
+survivedTest <- Survived[-index]
+
+k1 <- round(sqrt(dim(kNNTraining)[1])) #sqrt of number of instances
+k2 <- round(sqrt(dim(kNNTraining)[2])) #sqrt of number of attributes
+k3 <- 7 #a number between 3 and 10
+kNNTraining[,-1]
+
+library(class)
+knn1 <- knn(train = kNNTraining, test = kNNTesting, cl = survivedTrain, k=k1)
+knn2 <- knn(train = kNNTraining, test = kNNTesting, cl = survivedTrain, k=k2)
+knn3 <- knn(train = kNNTraining, test = kNNTesting, cl = survivedTrain, k=k3)
+
+dim(kNNTraining)
+dim(kNNTesting)
+dim(survivedTrain)
+
+confusionMatrix(knn1, survivedTest)
+confusionMatrix(knn2, survivedTest)
+confusionMatrix(knn3, survivedTest)
