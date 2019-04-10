@@ -1,4 +1,5 @@
 # load clean data
+setwd("D:\\Ms in Data Analytics\\ADM\\Labs\\ADM-Labs")
 set.seed(1337)
 titanicData <- read.csv("titanicCleaned.csv")
 
@@ -45,7 +46,8 @@ confusionMatrix(testing$Survived, rPartPrediction, positive="Yes")
 # AUROC
 
 library(ROCR)
-ROCRperf <- performance(rPartPrediction,"tpr","fpr")
+#ROCRPred <- prediction(rPartPrediction, testing$Survived)
+#ROCRperf <- performance(ROCRPred,"tpr","fpr")
 
 plot(ROCRperf)
 
@@ -80,10 +82,9 @@ confusionMatrix(rPartPrediction, testing$Survived, positive = "Yes")
 
 # Try to prune the tree, and see how well it works.
 
-
-
-
-
+#treeToPrune <- rpart(Survived ~ ., data=train, method="class", control=rpart.control( your controls ))
+#prunedTree <- prp(treeToPrune,snip=TRUE)$obj
+#fancyRpartPlot(prunedTree)
 
 
 

@@ -85,3 +85,5 @@ summary(cFifty)
 cFiftyPredict <- predict(cFifty, newdata = testing[,-1])
 
 confusionMatrix(cFiftyPredict,testing$Survived, positive = "Yes")
+
+# using different methods of preprocessing data could improve the performance of algorithm
